@@ -2,10 +2,14 @@ const params = new URLSearchParams(location.search);
 const mailto = params.get("uri");
 
 if (mailto) {
-  const body = mailto.replace(/^mailto:/i, "");
-  location.replace(
-    "https://mail.google.com/mail/?extbody=" + encodeURIComponent(body) + "&view=cm&fs=1"
-  );
+  const url = new URL(mailto);
+  const to = url.pathname;
+  const gmail = new URLSearchParams({ view: "cm", fs: "1", to });
+  if (url.searchParams.get("subject")) gmail.set("su", url.searchParams.get("subject"));
+  if (url.searchParams.get("body")) gmail.set("body", url.searchParams.get("body"));
+  if (url.searchParams.get("cc")) gmail.set("cc", url.searchParams.get("cc"));
+  if (url.searchParams.get("bcc")) gmail.set("bcc", url.searchParams.get("bcc"));
+  location.replace("https://mail.google.com/mail/?" + gmail.toString());
 } else {
   navigator.registerProtocolHandler(
     "mailto",
